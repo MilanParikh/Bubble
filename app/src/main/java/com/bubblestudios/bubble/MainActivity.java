@@ -1,13 +1,11 @@
 package com.bubblestudios.bubble;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -28,11 +25,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.sql.Types;
-
 import static android.graphics.Color.parseColor;
 
-public class MainActivity extends AppCompatActivity implements CardsFragment.OnFragmentInteractionListener, UserProfileFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements CardsFragment.OnFragmentInteractionListener, LikedSongsFragment.OnFragmentInteractionListener {
 
     private Toolbar toolbar;
     private ActionBar actionBar;
@@ -171,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements CardsFragment.OnF
                 case 0:
                     return CardsFragment.newInstance();
                 case 1:
-                    return UserProfileFragment.newInstance();
+                    return LikedSongsFragment.newInstance();
                 default:
                     return null;
             }

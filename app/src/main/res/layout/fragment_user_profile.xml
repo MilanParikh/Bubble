@@ -5,7 +5,7 @@
     android:id="@+id/frameLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserProfileFragment">
+    tools:context=".LikedSongsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/user_profile_recyclerView"

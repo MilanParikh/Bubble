@@ -20,7 +20,25 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- YOUR CUSTOM VIEWS HERE -->
+        <TextView
+            android:id="@+id/details_song_title"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/details_artist_name"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/details_album_art"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginStart="8dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>
