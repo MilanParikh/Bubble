@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Bubble</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="upload">Upload</string>
     <string name="submit">Submit</string>
@@ -10,6 +8,7 @@
     <string name="pause_play">Pause/Play</string>
     <string name="song_title">Song Title</string>
     <string name="artist_name">Artist Name</string>
+    <string name="blurb">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ac ante non nisl imperdiet venenatis nec at nisl. Cras in volutpat est. Donec non malesuada nibh, quis feugiat elit. Duis elit ante, gravida a nisi a, aliquam dapibus odio. Nulla facilisi. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque dapibus, sapien vitae auctor lacinia, est nulla consequat purus, sit amet placerat risus lorem sed diam. Cras gravida consequat cursus. Aliquam placerat libero quis risus cursus, et commodo libero feugiat.  </string>
     <string name="choose_album_art">Choose Album Art</string>
     <string name="choose_snippet">Choose Song Snippet</string>
     <string name="uploading">Uploading</string>

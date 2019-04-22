@@ -21,15 +21,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link UserProfileFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link UserProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UserProfileFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
@@ -40,6 +31,7 @@ public class UserProfileFragment extends Fragment {
     }
 
     public static UserProfileFragment newInstance() {
+        //Androidy construction method that returns the fragment to another
         UserProfileFragment fragment = new UserProfileFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -48,6 +40,8 @@ public class UserProfileFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        //Initializes and restores the state of the Fragment from its Bundle
+        //This is a non-graphical initialization
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
@@ -56,8 +50,13 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //All graphical initializations are here. Returns a View to the Activity that called it,
+        //with View being the actual GUI
+
+        //Defines the view to be returned from the corresponding layout
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
 
+        //Firebase stuff
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -66,28 +65,36 @@ public class UserProfileFragment extends Fragment {
 
         Query query = FirebaseFirestore.getInstance().collection("users").document(user.getUid()).collection("liked").orderBy("timeStamp");
         Query query2 = FirebaseFirestore.getInstance().collection("snippets").whereArrayContains("liked_users", user.getUid());
+
+        //RecyclerView is a user interface that provides a scrolling list of elements based on calls
+        //to database which return indefinite numbers of things. Used here to present liked songs
         FirestoreRecyclerOptions<Snippet> options = new FirestoreRecyclerOptions.Builder<Snippet>().setQuery(query2, Snippet.class).build();
+
         adapter = new FirestoreRecyclerAdapter<Snippet, LikedSongHolder>(options) {
+            //The Adapter creates ViewHolders and Binds them to their data. Holders contain each song's data and layout
             @Override
             protected void onBindViewHolder(@NonNull LikedSongHolder holder, int position, @NonNull Snippet snippet) {
                 holder.songTitle.setText(snippet.getTitle());
                 holder.artistName.setText(snippet.getArtist());
                 Glide.with(holder.albumArt).load(albumArtRef.child(snippet.getAlbumArt())).into(holder.albumArt);
             }
-
             @NonNull
             @Override
             public LikedSongHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                //Creates the ViewHolder object containing the right stuff
                 return new LikedSongHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.liked_song_layout, viewGroup, false));
             }
         };
 
+        //Sets a Linear layout setup for the RecyclerView. Other options include grid/tile manager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
 
+        //There has to be a RecyclerView declaration on the layout/xml file. Rest of setup here
         RecyclerView recyclerView = view.findViewById(R.id.user_profile_recyclerView);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
 
+        //The View is ready to be returned to the Activity
         return view;
     }
 
@@ -102,7 +109,6 @@ public class UserProfileFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
-
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

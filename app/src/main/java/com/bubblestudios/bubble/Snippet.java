@@ -8,15 +8,17 @@ import java.util.List;
 public class Snippet {
     private String title;
     private String artist;
+    private String blurb;
     private String snippet;
     private String albumArt;
     private List<String> liked_users;
     private List<String> disliked_users;
     @ServerTimestamp private Date timeStamp;
 
-    public Snippet(String title, String artist, String snippet, String albumArt) {
+    public Snippet(String title, String artist, String blurb, String snippet, String albumArt) {
         this.title = title;
         this.artist = artist;
+        this.blurb = blurb;
         this.snippet = snippet;
         this.albumArt = albumArt;
     }
@@ -45,6 +47,14 @@ public class Snippet {
 
     public void setSnippet(String snippet) {
         this.snippet = snippet;
+    }
+
+    public String getBlurb() {
+        return blurb;
+    }
+
+    public void setBlurb(String blurb) {
+        this.blurb = blurb;
     }
 
     public String getAlbumArt() {
