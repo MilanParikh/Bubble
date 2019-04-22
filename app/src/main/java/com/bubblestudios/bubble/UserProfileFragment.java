@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -77,6 +78,16 @@ public class UserProfileFragment extends Fragment {
                 holder.songTitle.setText(snippet.getTitle());
                 holder.artistName.setText(snippet.getArtist());
                 Glide.with(holder.albumArt).load(albumArtRef.child(snippet.getAlbumArt())).into(holder.albumArt);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Listens for click on each entry in recyclerView entries
+                        //Opens new SongDetailsDialog for the clicked entry
+                        SongDetailsDialog dialog = new SongDetailsDialog();
+                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        dialog.show(ft, SongDetailsDialog.TAG);
+                    }
+                });
             }
             @NonNull
             @Override
@@ -94,7 +105,6 @@ public class UserProfileFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
 
-        //The View is ready to be returned to the Activity
         return view;
     }
 
