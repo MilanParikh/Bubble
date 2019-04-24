@@ -118,11 +118,6 @@ public class CardsFragment extends Fragment implements CardStackListener {
                 }
             }
         });
-        FirestoreRecyclerOptions<Snippet> options = new FirestoreRecyclerOptions.Builder<Snippet>().setQuery(query, Snippet.class).build();
-
-        //adapter = new CardStackAdapter(options, albumArtRef, snippetRef, exoPlayer, dataSourceFactory, this);
-
-        //cardStackView.setAdapter(adapter);
         layoutManager = new CardStackLayoutManager(getContext(), this);
         cardStackView.setLayoutManager(layoutManager);
 

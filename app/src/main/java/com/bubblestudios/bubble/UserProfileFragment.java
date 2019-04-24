@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,26 +15,27 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link UserProfileFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link UserProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UserProfileFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private FirestoreRecyclerAdapter adapter;
+    private LikedSongAdapter adapter;
+    private RecyclerView likedSongRecyclerView;
+    private List<DocumentSnapshot> snapshotList;
+    private SwipeRefreshLayout swipeRefresh;
+    private FirebaseUser user;
 
     public UserProfileFragment() {
         // Required empty public constructor
@@ -58,56 +60,64 @@ public class UserProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
         final StorageReference albumArtRef = storageRef.child("AlbumArt");
 
-        Query query = FirebaseFirestore.getInstance().collection("users").document(user.getUid()).collection("liked").orderBy("timeStamp");
-        Query query2 = FirebaseFirestore.getInstance().collection("snippets").whereArrayContains("liked_users", user.getUid());
-        FirestoreRecyclerOptions<Snippet> options = new FirestoreRecyclerOptions.Builder<Snippet>().setQuery(query2, Snippet.class).build();
-        adapter = new FirestoreRecyclerAdapter<Snippet, LikedSongHolder>(options) {
+        likedSongRecyclerView = view.findViewById(R.id.user_profile_recyclerView);
+        Query query = FirebaseFirestore.getInstance().collection("snippets").whereArrayContains("liked_users", user.getUid());
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            protected void onBindViewHolder(@NonNull LikedSongHolder holder, int position, @NonNull Snippet snippet) {
-                holder.songTitle.setText(snippet.getTitle());
-                holder.artistName.setText(snippet.getArtist());
-                Glide.with(holder.albumArt).load(albumArtRef.child(snippet.getAlbumArt())).into(holder.albumArt);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    snapshotList = task.getResult().getDocuments();
+                    adapter = new LikedSongAdapter(snapshotList, albumArtRef);
+                    likedSongRecyclerView.setAdapter(adapter);
+                    adapter.getFilter().filter("");
+                }
             }
-
-            @NonNull
-            @Override
-            public LikedSongHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                return new LikedSongHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.liked_song_layout, viewGroup, false));
-            }
-        };
+        });
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        likedSongRecyclerView.setLayoutManager(layoutManager);
 
-        RecyclerView recyclerView = view.findViewById(R.id.user_profile_recyclerView);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(layoutManager);
+        swipeRefresh = view.findViewById(R.id.swipe_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshData();
+            }
+        });
 
         return view;
+    }
+
+    public void refreshData() {
+        Query query = FirebaseFirestore.getInstance().collection("snippets").whereArrayContains("liked_users", user.getUid());
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    snapshotList.clear();
+                    List<DocumentSnapshot> tempSnapList = task.getResult().getDocuments();
+                    snapshotList.addAll(tempSnapList);
+                    adapter.notifyDataSetChanged();
+                    swipeRefresh.setRefreshing(false);
+                }
+            }
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
-    }
-
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
