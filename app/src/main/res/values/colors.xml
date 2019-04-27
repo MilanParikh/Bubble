@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="trueWhite">#F4F4F4</color>
+    <color name="trueGrey">#4D4D4D</color>
+    <color name="lightPink">#FFDEF3</color>
+    <color name="bubblePink">#FF61BE</color>
+    <color name="bubbleDark">#35212A</color>
+    <color name="bubbleBlue">#3B55CE</color>
 </resources>

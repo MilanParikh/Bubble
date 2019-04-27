@@ -10,18 +10,40 @@
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/bubblePink"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        tools:layout_editor_absoluteX="0dp" >
+        tools:layout_editor_absoluteX="0dp">
+
         <ImageView
-            android:id="@+id/profile_icon"
-            android:layout_width="wrap_content"
+            android:id="@+id/bubble_logo"
+            android:src="@drawable/logo4x"
             android:layout_height="match_parent"
+            android:layout_width="140dp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"/>
+
+        <FrameLayout
             android:padding="8dp"
-            android:layout_gravity="right" />
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="right">
+
+            <ImageView
+                android:id="@+id/profile_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/mask_heart" />
+
+        </FrameLayout>
+
+
     </android.support.v7.widget.Toolbar>
 
     <com.bubblestudios.bubble.TouchDisabledViewPager

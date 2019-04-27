@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -15,7 +16,9 @@
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
+
     <FrameLayout
+        android:background="#730098"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -23,12 +26,21 @@
         <TextView
             android:id="@+id/details_song_title"
             android:layout_width="380dp"
+            android:textColor="#FFF"
             android:layout_height="wrap_content" />
+
 
         <TextView
             android:id="@+id/details_artist_name"
-            android:layout_width="380dp"
-            android:layout_height="wrap_content" />
+            android:layout_width="384dp"
+            android:textColor="#FFF"
+            android:layout_height="wrap_content"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/xml_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/details_album_art"
@@ -39,6 +51,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+
 
     </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

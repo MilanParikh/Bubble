@@ -14,9 +14,14 @@
     <string name="uploading">Uploading</string>
     <string name="upload_failed">Upload Failed</string>
     <string name="upload_successful">Upload Successful</string>
+    <string name="choose_artist_art">Choose Artist Art</string>
+    <string name="artist_blurb_hint">Artist Blurb</string>
+    <string name="upload_artist">Upload Artist</string>
+    <string name="upload_snippet">Upload Snippet</string>
 
     <string name="settings">Settings</string>
     <string name="logout">Logout</string>
+    <string name="search">Search</string>
 
     <string-array name="song_genres">
         <item></item>

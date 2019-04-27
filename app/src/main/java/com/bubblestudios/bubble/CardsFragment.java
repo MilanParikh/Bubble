@@ -1,6 +1,7 @@
 package com.bubblestudios.bubble;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -118,11 +119,6 @@ public class CardsFragment extends Fragment implements CardStackListener {
                 }
             }
         });
-        FirestoreRecyclerOptions<Snippet> options = new FirestoreRecyclerOptions.Builder<Snippet>().setQuery(query, Snippet.class).build();
-
-        //adapter = new CardStackAdapter(options, albumArtRef, snippetRef, exoPlayer, dataSourceFactory, this);
-
-        //cardStackView.setAdapter(adapter);
         layoutManager = new CardStackLayoutManager(getContext(), this);
         cardStackView.setLayoutManager(layoutManager);
 
@@ -145,6 +141,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
                 cardStackView.swipe();
             }
         });
+
         Button dislikeButton = view.findViewById(R.id.dislike_button);
         dislikeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +150,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
                 cardStackView.swipe();
             }
         });
+
 
         //adapter.startListening();
 
@@ -239,6 +237,8 @@ public class CardsFragment extends Fragment implements CardStackListener {
     public void onCardCanceled() {
 
     }
+
+
 
     @Override
     public void onCardAppeared(View view, int position) {

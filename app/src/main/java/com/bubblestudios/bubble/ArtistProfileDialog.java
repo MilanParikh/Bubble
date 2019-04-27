@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +17,18 @@ import android.widget.Toolbar;
 import com.bubblestudios.bubble.R;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class SongDetailsDialog extends DialogFragment {
+public class ArtistProfileDialog extends DialogFragment {
 
     public static String TAG = "SongDetailsDialog";
-    //public TextView songBlurb;
     TextView artistName;
-    TextView songTitle;
-    ImageView albumArt;
-    Snippet snippet;
-    //TextView songBlurb;
+    TextView artistBlurb;
+    DocumentReference artistRef;
 
-    public void attachSnippet(Snippet snippet) {
-
-        this.snippet = snippet;
-
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,19 +40,23 @@ public class SongDetailsDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
-
         Bundle d_snips = getArguments();
+        View view = inflater.inflate(R.layout.artist_profile, container, false);
+        artistBlurb = view.findViewById(R.id.description);
+        artistName = view.findViewById(R.id.name);
 
-
-        View view = inflater.inflate(R.layout.song_details_dialog, container, false);
-        artistName = view.findViewById(R.id.details_artist_name);
-        songTitle = view.findViewById(R.id.details_song_title);
-        albumArt = view.findViewById(R.id.details_album_art);
-
-        // Use d_snips Bundle to access snippet info
-        //songTitle.setText(d_snips.getString("songTitle"));
         artistName.setText(d_snips.getString("artistName"));
-        songTitle.setText(d_snips.getString("songBlurb"));
+        //artistBlurb.setText(d_snips.getString("artistBlurb")); // moved this to the artist object (get it below from artistRef)
+
+        //retrieve the reference path from the bundle
+        String artistRefPath = d_snips.getString("artistRefPath");
+        //check if it exists
+        if(artistRefPath!=null){
+            //create a document reference from the path
+            //you can get the artist object from here now and then the artistArt from that
+            artistRef = FirebaseFirestore.getInstance().document(artistRefPath);
+        }
+
         return view;
     }
 
