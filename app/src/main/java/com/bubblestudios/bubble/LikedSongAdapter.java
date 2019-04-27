@@ -1,14 +1,20 @@
 package com.bubblestudios.bubble;
 
+import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
 
@@ -20,10 +26,13 @@ public class LikedSongAdapter extends RecyclerView.Adapter<LikedSongHolder> impl
     private List<DocumentSnapshot> snapshotList;
     private List<DocumentSnapshot> filteredSnapshotList;
     private StorageReference albumArtRef;
+    private Snippet snippet;
+    private Context context;
 
-    public LikedSongAdapter(List<DocumentSnapshot> snapshotList, StorageReference albumArtRef) {
+    public LikedSongAdapter(List<DocumentSnapshot> snapshotList, StorageReference albumArtRef, Context context) {
         this.snapshotList = snapshotList;
         this.albumArtRef = albumArtRef;
+        this.context = context;
     }
 
     @NonNull
@@ -34,11 +43,57 @@ public class LikedSongAdapter extends RecyclerView.Adapter<LikedSongHolder> impl
 
     @Override
     public void onBindViewHolder(@NonNull LikedSongHolder holder, int i) {
-        Snippet snippet = filteredSnapshotList.get(i).toObject(Snippet.class);
+        snippet = filteredSnapshotList.get(i).toObject(Snippet.class);
 
         holder.songTitle.setText(snippet.getTitle());
         holder.artistName.setText(snippet.getArtist());
         Glide.with(holder.albumArt).load(albumArtRef.child(snippet.getAlbumArt())).into(holder.albumArt);
+
+        //Create Bundles so that snippet data can be translated to dialog
+        final Bundle snips = new Bundle();
+        snips.putString("songTitle",snippet.getTitle());
+        snips.putString("artistName",snippet.getArtist());
+        snips.putString("songBlurb",snippet.getSongBlurb());
+
+        final Bundle aSnips = new Bundle();
+        aSnips.putString("songTitle",snippet.getTitle());
+        aSnips.putString("artistName",snippet.getArtist());
+        //aSnips.putString("artistBlurb",snippet.getArtistBlurb()); //moved this to the artist object
+        //Gets the artist reference from the snippet
+        DocumentReference artistRef = snippet.getArtistRef();
+        //Check if it actually exits (we only have one artist right now, so only one song has an artistRef attached)
+        if(artistRef != null) {
+            //put the path (in firestore) of the reference in the bundle
+            aSnips.putString("artistRefPath", artistRef.getPath());
+        }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Listens for click on each entry in recyclerView entries
+                //Opens new SongDetailsDialog for the clicked entry
+                SongDetailsDialog dialog = new SongDetailsDialog();
+                FragmentTransaction ft = ((AppCompatActivity)context).getSupportFragmentManager().beginTransaction();
+                dialog.setArguments(snips);
+                dialog.show(ft, SongDetailsDialog.TAG);
+
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                //Listens for long click on each entry in recyclerView entries
+                //Opens new ArtistDetailsDialog for the clicked entry
+
+                ArtistProfileDialog a_dialog = new ArtistProfileDialog();
+                FragmentTransaction ft = ((AppCompatActivity)context).getSupportFragmentManager().beginTransaction();
+                a_dialog.setArguments(aSnips);
+                a_dialog.show(ft, ArtistProfileDialog.TAG);
+                return true;
+            }
+        });
     }
 
     @Override

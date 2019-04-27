@@ -12,23 +12,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import static android.graphics.Color.parseColor;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UploadActivity extends AppCompatActivity {
+public class UploadSnippetActivity extends AppCompatActivity {
 
     private int PICK_IMAGE_REQUEST = 1;
     private int PICK_AUDIO_REQUEST = 2;
@@ -38,20 +46,23 @@ public class UploadActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private FirebaseFirestore db;
     private Button uploadAlbumArtButton, uploadSnippetButton, chooseAlbumArtButton, chooseSnippetButton;
-    private EditText songTitleEditText, artistNameEditText;
-    private String albumArtFileName, snippetFileName;
+    private EditText songTitleEditText;
+    private String albumArtFileName, snippetFileName, songBlurb="test", artistBlurb = "test", artistName;
+    private Spinner artistSpinner;
+    private ArrayAdapter<String> spinnerAdapter;
+    private List<String> artistNames, liked_users = new ArrayList<>(), disliked_users = new ArrayList<>();
+    private List<DocumentReference> artistRefs;
+    private DocumentReference artistRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload);
+        setContentView(R.layout.activity_upload_snippet);
 
         Toolbar toolbar = findViewById(R.id.upload_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
-        //toolbar.setLogo(R.drawable.logo);
-        toolbar.setBackgroundColor(parseColor("#560A86"));
-        toolbar.setTitle(R.string.upload);
+        toolbar.setTitle(R.string.upload_snippet);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -62,7 +73,6 @@ public class UploadActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         songTitleEditText = findViewById(R.id.song_title_editText);
-        artistNameEditText = findViewById(R.id.artist_name_editText);
         chooseAlbumArtButton = findViewById(R.id.choose_album_art_button);
         chooseAlbumArtButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,8 +107,7 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String songTitle = songTitleEditText.getText().toString();
-                String artistName = artistNameEditText.getText().toString();
-                Snippet snippet = new Snippet(songTitle, artistName, snippetFileName, albumArtFileName);
+                Snippet snippet = new Snippet(songTitle, artistName, songBlurb , snippetFileName, albumArtFileName, liked_users, disliked_users, artistRef);
 
                 db.collection("snippets").add(snippet).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -113,11 +122,46 @@ public class UploadActivity extends AppCompatActivity {
                         uploadSnippetButton.setText(R.string.upload);
                         uploadAlbumArtButton.setEnabled(false);
                         uploadSnippetButton.setEnabled(false);
-                        artistNameEditText.setText("");
                         songTitleEditText.setText("");
                         Toast.makeText(getApplicationContext(), "Submitted Successfully", Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        });
+
+        artistSpinner = findViewById(R.id.artist_spinner);
+        CollectionReference artistsRef = db.collection("artists");
+        artistNames = new ArrayList<>();
+        artistRefs = new ArrayList<>();
+        spinnerAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, artistNames);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        artistSpinner.setAdapter(spinnerAdapter);
+        artistsRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    List<DocumentSnapshot> snapshots = task.getResult().getDocuments();
+                    for(DocumentSnapshot snapshot: snapshots) {
+                        Artist artist = snapshot.toObject(Artist.class);
+                        artistNames.add(artist.getArtistName());
+                        artistRefs.add(snapshot.getReference());
+                    }
+                    spinnerAdapter.notifyDataSetChanged();
+                    artistName = artistNames.get(0);
+                    artistRef = artistRefs.get(0);
+                }
+            }
+        });
+        artistSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                artistRef = artistRefs.get(i);
+                artistName = artistNames.get(i);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 

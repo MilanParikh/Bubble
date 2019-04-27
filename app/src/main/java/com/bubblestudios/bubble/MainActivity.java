@@ -1,13 +1,11 @@
 package com.bubblestudios.bubble;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,20 +15,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.sql.Types;
-
-import static android.graphics.Color.parseColor;
 
 public class MainActivity extends AppCompatActivity implements CardsFragment.OnFragmentInteractionListener, UserProfileFragment.OnFragmentInteractionListener {
 
@@ -38,19 +30,17 @@ public class MainActivity extends AppCompatActivity implements CardsFragment.OnF
     private ActionBar actionBar;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
+    private ImageView profileIcon, logo;
+    private Uri photoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        toolbar.setLogo(R.drawable.logo);
+        toolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
-        //toolbar.setTitle(string.app_name);
-        //toolbar.setTitleTextColor(parseColor("#FFACFC"));
-        toolbar.setBackgroundColor(parseColor("#560A86"));
+        toolbar.setTitle("");
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         actionBar = getSupportActionBar();
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,10 +51,11 @@ public class MainActivity extends AppCompatActivity implements CardsFragment.OnF
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         user.getUid();
-        Uri photoUrl = user.getPhotoUrl();
-        ImageView profileIcon = findViewById(R.id.profile_icon);
-        Glide.with(profileIcon).load(photoUrl).apply(RequestOptions.circleCropTransform()).into(profileIcon);
 
+        photoUrl = user.getPhotoUrl();
+        profileIcon = findViewById(R.id.profile_icon);
+        logo = findViewById(R.id.bubble_logo);
+        Glide.with(profileIcon).load(photoUrl).into(profileIcon);
         profileIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,9 +77,13 @@ public class MainActivity extends AppCompatActivity implements CardsFragment.OnF
                 switch(i) {
                     case 0:
                         actionBar.setDisplayHomeAsUpEnabled(false);
+                        profileIcon.setVisibility(View.VISIBLE);
+                        logo.setVisibility(View.VISIBLE);
                         break;
                     case 1:
                         actionBar.setDisplayHomeAsUpEnabled(true);
+                        profileIcon.setVisibility(View.GONE);
+                        logo.setVisibility(View.GONE);
                         break;
                 }
                 invalidateOptionsMenu();
@@ -124,11 +119,11 @@ public class MainActivity extends AppCompatActivity implements CardsFragment.OnF
         inflater.inflate(R.menu.main_activity_menu, menu);
         int pageNum = (viewPager.getCurrentItem());
         if ( pageNum== 1) {
-            menu.findItem(R.id.app_bar_search).setVisible(true);
+            menu.findItem(R.id.menu_search).setVisible(true);
 
         }
         else {
-            menu.findItem(R.id.app_bar_search).setVisible(false);
+            menu.findItem(R.id.menu_search).setVisible(false);
         }
 
         return true;
@@ -140,9 +135,13 @@ public class MainActivity extends AppCompatActivity implements CardsFragment.OnF
             case R.id.menu_settings_button:
                 //settings menu
                 return true;
-            case R.id.menu_upload_button:
-                Intent intent = new Intent(this, UploadActivity.class);
+            case R.id.menu_upload_snippet_button:
+                Intent intent = new Intent(this, UploadSnippetActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.menu_upload_artist_button:
+                Intent intent2 = new Intent(this, UploadArtistActivity.class);
+                startActivity(intent2);
                 return true;
             case R.id.menu_logout_button:
                 AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {

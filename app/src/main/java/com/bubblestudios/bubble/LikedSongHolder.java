@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class LikedSongHolder extends RecyclerView.ViewHolder {
+    //ViewHolder extended for Liked Song properties and click listener
 
     public TextView artistName;
     public TextView songTitle;
@@ -18,4 +19,5 @@ public class LikedSongHolder extends RecyclerView.ViewHolder {
         songTitle = itemView.findViewById(R.id.liked_song_title);
         albumArt = itemView.findViewById(R.id.liked_album_art);
     }
+
 }
